@@ -1,0 +1,502 @@
+# How it works:
+# - rename to 'Config.ecf' to activate
+# - change original values of parameters as desired
+# - listed parameters will overwrite the game's internal original values
+# - parameters not listed (commented out / removed) will cause the game to continue using the internal ORIGINAL values
+
+VERSION: 8
+
+
+# ==================== BLOCKS, DEVICES ==========================
+
+
+# Properties:
+# IsAccessible: shows up in Control Panel
+# O2Accept: "OxygenBottleLarge,OxygenBottleSmall" > items that can be used to fill a O2 tank. First item in list will be filled when O2 is withdrawn
+# FuelAccept: "EnergyCell, EnergyCellLarge, EnergyCellHydrogen, FusionCell, BioFuel" > items that can be used to fill a fuel tank. First item in list will be filled when fuel is withdrawn
+{ Block Id: 53, Name: SathiumResource
+  Material: resourcemedium
+  Group: resource
+  { Child DropOnDestroy
+    Count: "2,4"
+    Prob: 0.2
+  }
+}
+{ Template Name: DrillT2
+  CraftTime: 20
+  Target: "BaseC,LargeC,AdvC"
+  { Child Inputs
+    MechanicalComponents: 5
+    Electronics: 2
+    OpticalFiber: 1
+    EnergyMatrix: 1
+  }
+}
+# ==================== LOOT TABLES ==============================
+# Item line: "Group|Name_x" (x incrementing), data: "probability" [, xdata="count range"] (default = 1,1)
+# NOTE: Please currently always use 8 columns! (first number in "Size" line)
+# Oviraptor
+{ Container Id: 9
+  Count: "1,2"
+  Size: "8,1"
+  SfxOpen: UseActions/body_open
+  SfxClose: UseActions/body_close
+  { Child Items
+    Name_0: Meat, xdata: "1,4"
+    Name_2: Egg, data: 0.6, xdata: "1,2"
+  }
+}
+# Dino small (Raptor, Megalonops, Parasaur)
+{ Container Id: 10
+  Count: "1,2"
+  Size: "8,1"
+  SfxOpen: UseActions/body_open
+  SfxClose: UseActions/body_close
+  { Child Items
+    Name_0: Meat, xdata: "1,4"
+    Name_1: Egg, data: 0.6, xdata: "1,2"
+  }
+}
+# Dino large (Triceratops, Pangolin)
+{ Container Id: 31
+  Count: "4,6"
+  Size: "8,1"
+  SfxOpen: UseActions/body_open
+  SfxClose: UseActions/body_close
+  { Child Items
+    Name_0: Meat, data: 1, xdata: "5,10"
+    Name_1: Egg, data: 0.6, xdata: "1,2"
+  }
+}
+# AlienBug01
+{ Container Id: 33
+  Count: "1,2"
+  Size: "8,1"
+  SfxOpen: UseActions/body_open
+  SfxClose: UseActions/body_close
+  { Child Items
+    Name_0: Meat, data: 0.6, xdata: "4,5"
+    Name_1: AlienParts02, data: 0.5, xdata: "2,3"
+    Name_2: AlienTooth, data: 0.3, xdata: "4,5"
+  }
+}
+# TroopTransporters
+{ Container Id: 16
+  Count: "4,6"
+  Size: "8,2"
+  SfxOpen: UseActions/drone_open
+  SfxClose: UseActions/drone_close
+  { Child Items
+    Group_0: WeaponsVeryRare, data: 1.0
+    Group_1: EnergyItems, data: 1.3
+    Group_2: MedicalItems, data: 1.3
+    Group_3: WeaponsRare, data: 1.3
+    Group_4: WeaponsRareKit, data: 1.3
+  }
+}
+# DroneLargeAttackBase
+{ Container Id: 160
+  Count: "2,3"
+  Size: "8,1"
+  SfxOpen: UseActions/drone_open
+  SfxClose: UseActions/drone_close
+  { Child Items
+    Name_0: FastRocket, data: 0.9, xdata: "150,300"
+    Name_1: FusionCell, data: 0.8, xdata: "20,30"
+    Name_2: WeaponSV05, data: 1.0, xdata: 1
+    Group_1: ComponentsRare, data: 1.0
+  }
+}
+# ================= Weapons ========================
+#
+{ Item Id: 2071, Name: Chainsaw
+  PickupToToolbar: true
+  StackSize: 1
+  Category: Weapons/Items
+  Mass: 6, type: float, display: true, formatter: Kilogram
+  Durability: 500, display: false
+  DegradationProb: 0.0625, type: float, display: false
+  {
+    AllowRemote: false
+    HarvestSupport: false
+    ROF: 0.25, type: float
+    Range: 2, display: false
+    NoiseStrength: 60, display: false
+    CameraShake: 0
+    IgnoreAtmo: true
+    Automatic: true
+    Damage: 65, display: true
+    AmmoCapacity: 125, display: true
+    AmmoType: BioFuel, display: true
+    ReloadDelay: 3.8, display: true
+    DamageMultiplier_1: 0.04, data: wood|plants
+    DamageMultiplier_2: 0, data: concrete|hull|hullarmored|hullcombat|metal|metalhard
+    DamageMultiplier_3: 0, data: dirt|stone|rock
+    DamageMultiplier_4: 5, data: head, display: DmgMultiplierHead
+  }
+  UnlockCost: 0, display: true
+  UnlockLevel: 1, display: true
+  TechTreeNames: Tools
+}
+{ Template Name: PromethiumPellets
+  OutputCount: 20
+  CraftTime: 5
+  Target: "SurvC,SmallC,HoverC,BaseC,LargeC,AdvC"
+  { Child Inputs
+    PromethiumOre: 1
+  }
+}
+{ Template Name: EnergyCell
+  OutputCount: 4
+  CraftTime: 5
+  Target: "SurvC,SmallC,HoverC,BaseC,LargeC,AdvC"
+  { Child Inputs
+    PromethiumPellets: 10
+  }
+}
+{ Template Name: EnergyCellLarge
+  OutputCount: 4
+  CraftTime: 15
+  Target: "LargeC,AdvC"
+  { Child Inputs
+    PromethiumPellets: 50
+  }
+}
+{ Template Name: FusionCell
+  OutputCount: 10
+  CraftTime: 15
+  Target: AdvC
+  { Child Inputs
+    PromethiumPellets: 50
+    HydrogenBottle: 10
+  }
+}
+{ Template Name: MagnesiumPowder
+  OutputCount: 20
+  CraftTime: 5
+  Target: "SurvC,SmallC,HoverC,BaseC,LargeC,AdvC"
+  { Child Inputs
+    MagnesiumOre: 5
+  }
+}
+{ Template Name: 5.8mmBullet
+  OutputCount: 150
+  CraftTime: 5
+  Target: "SmallC,HoverC,BaseC,LargeC,AdvC"
+  { Child Inputs
+    SteelPlate: 8
+    CopperIngot: 4
+    NCPowder: 1
+  }
+}
+{ Item Id: 2053, Name: Minigun
+  PickupToToolbar: true
+  StackSize: 1
+  Category: Weapons/Items
+  Mass: 12, type: float, display: true, formatter: Kilogram
+  Volume: 5, type: float, display: true, formatter: Liter
+  Durability: 500, display: false
+  DegradationProb: 0.05, type: float, display: false
+  {
+    AllowRemote: false
+    ROF: 0.05, type: float, display: true, formatter: ROF
+    Range: 150, display: false
+    NoiseStrength: 120, display: false
+    CameraShake: 1
+    Automatic: true, display: true
+    BulletSpread: 0.3, display: true
+    Recoil: 0.5, display: true
+    Damage: 28, display: true
+    AmmoCapacity: 250, display: true
+    AmmoType: 8.3mmBullet, display: true
+    ReloadDelay: 3.9, display: true
+    Tracer: Weapons/Projectiles/TracerOrange1
+    DamageMultiplier_1: 2.5, data: head, display: DmgMultiplierHead
+    DamageMultiplier_2: 0.09, data: wood
+    DamageMultiplier_3: 0, data: dirt|stone|rock|hullarmored|hullcombat
+    DamageMultiplier_4: 0, data: shield
+  }
+  UnlockCost: 17, display: true
+  UnlockLevel: 15, display: true
+  TechTreeParent: RocketLauncher
+  TechTreeNames: Weapons
+}
+{ Item Id: 2055, Name: Sniper
+  PickupToToolbar: true
+  StackSize: 1
+  Category: Weapons/Items
+  Mass: 6, type: float, display: true, formatter: Kilogram
+  Volume: 4, type: float, display: true, formatter: Liter
+  Durability: 500, display: false
+  DegradationProb: 0.625, type: float, display: false
+  {
+    AllowRemote: false
+    ROF: 0.5, type: float, display: true, formatter: ROF
+    Range: 303, display: false
+    NoiseStrength: 100, display: false
+    CameraShake: 0
+    Automatic: false
+    BulletSpread: 0.03, display: true
+    Recoil: 1.1, display: true
+    Damage: 220, display: true
+    AmmoCapacity: 6, display: true
+    AmmoType: 12.7mmBullet, display: true
+    ReloadDelay: 3.1, display: true
+    Tracer: Weapons/Projectiles/TracerOrange1
+    TracerPerBullet: 1
+    DamageMultiplier_1: 6, data: head, display: DmgMultiplierHead
+    DamageMultiplier_2: 0, data: dirt|stone|rock|wood|hullarmored|hullcombat
+    DamageMultiplier_3: 0, data: shield
+  }
+  {
+  }
+  UnlockCost: 7, display: true
+  UnlockLevel: 5, display: true
+  TechTreeParent: AssaultRifle
+  TechTreeNames: Weapons
+}
+{ Item Id: 2063, Name: AssaultRifle
+  PickupToToolbar: true
+  StackSize: 1
+  Category: Weapons/Items
+  Mass: 4, type: float, display: true, formatter: Kilogram
+  Volume: 2, type: float, display: true, formatter: Liter
+  Durability: 500, display: false
+  DegradationProb: 0.08, type: float, display: false
+  {
+    AllowRemote: false
+    ROF: 0.2, type: float, display: true, formatter: ROF
+    Range: 150, display: false
+    NoiseStrength: 100, display: false
+    CameraShake: 1
+    Automatic: true, display: true
+    BulletSpread: 0.16, display: true
+    Recoil: 0.6, display: true
+    Damage: 70, display: true
+    AmmoCapacity: 30, display: true
+    AmmoType: 5.8mmBullet, display: true
+    ReloadDelay: 3.1, display: true
+    Tracer: Weapons/Projectiles/TracerOrange1
+    TracerPerBullet: 2
+    DamageMultiplier_1: 7, data: head, display: DmgMultiplierHead
+    DamageMultiplier_2: 0, data: dirt|stone|rock|wood|hullarmored|hullcombat
+    DamageMultiplier_3: 0, data: shield
+  }
+  {
+  }
+  UnlockCost: 6, display: true
+  UnlockLevel: 3, display: true
+  TechTreeNames: Weapons
+}
+{ Template Name: ArmorMedium
+  CraftTime: 120
+  Target: "LargeC,AdvC"
+  { Child Inputs
+    SteelPlate: 40
+    Electronics: 5
+    OpticalFiber: 5
+  }
+}
+{ Item Id: 2649, Name: ArmorMedium
+  Mass: 18, type: float, display: false, formatter: Kilogram
+  Volume: 3, type: float, display: true, formatter: Liter
+  VolumeCapacity: 150, type: float, display: true, formatter: Liter
+  StackSize: 1
+  Category: Weapons/Items
+  Durability: 1000, display: true
+  Oxygen: 562, type: int, display: true
+  Armor: 800, type: int, display: true
+  Heat: 25, type: int, display: true
+  Cold: 40, type: int, display: true
+  Radiation: 8, type: int, display: true
+  FallDamageFac: 0.60, type: float, display: true
+  PowerFac: 0.53, type: float, display: true
+  SpeedFac: 0.75, type: float, display: true
+  JumpFac: 0.55, type: float, display: true
+  JetpackFac: 1.44, type: float, display: true
+  FoodFac: 1.73, type: float, display: true
+  StaminaFac: 1.33, type: float, display: true
+  NrSlots: 3, type: int, display: true
+}
+{ Template Name: Explosives
+  OutputCount: 5
+  CraftTime: 5
+  Target: "SmallC,HoverC,BaseC,LargeC,AdvC"
+  { Child Inputs
+    SteelPlate: 4
+    EnergyCell: 4
+    Electronics: 1
+  }
+}
+# ============================ Other ==================================
+{ Block Id: 1494, Name: SolarPanelBlocks
+  Group: cpgSolar
+  PanelAngle: 30
+  SolarPanelEfficiency: 5.0, display: true
+  Material: metallight
+  Category: Devices
+  Mass: 250, type: float, display: true, formatter: Kilogram
+  Volume: 25, type: float, display: true, formatter: Liter
+  MaxCount: 50, type: int, display: true
+  CPUIn: 45, type: int, display: true
+  ChildBlocks: "SolarPanelSlope, SolarPanelSlope2, SolarPanelSlope3, SolarPanelHorizontal, SolarPanelHorizontal2, SolarPanelHorizontalMount, SolarPanelHorizontalStand"
+  Info: bkiSolarPanel, display: true
+  IsOxygenTight: varies, display: true
+  UnlockCost: 5, display: true
+  UnlockLevel: 3, display: true
+  TechTreeParent: SolarPanelSmallBlocks
+  TechTreeNames: Base
+}
+{ Block Id: 1496, Name: SolarPanelSlope
+  Group: cpgSolar
+  PanelAngle: 30
+  SolarPanelEfficiency: 5.0, display: true
+  Material: metallight
+  Category: Devices
+  HitPoints: 150, type: int, display: true
+  Mass: 250, type: float, display: true, formatter: Kilogram
+  MaxCount: 50, type: int, display: true
+  CPUIn: 45, type: int, display: true
+  TemplateRoot: SolarPanelBlocks
+  IsOxygenTight: false, display: true
+  BlockColor: "110,110,110"
+}
+{ Block Id: 1513, Name: SolarPanelSmallBlocks
+  Group: cpgSolar
+  PanelAngle: 30
+  SolarPanelEfficiency: 5.0, display: true
+  Material: metallight
+  Category: Devices
+  HitPoints: 100, type: int, display: true
+  Mass: 150, type: float, display: true, formatter: Kilogram
+  Volume: 15, type: float, display: true, formatter: Liter
+  MaxCount: 50, type: int, display: true
+  CPUIn: 20, type: int, display: true
+  ChildBlocks: "SolarPanelSlopeSmall, SolarPanelSlope3Small, SolarPanelHorizontalSmall"
+  Info: bkiSolarPanel, display: true
+  IsOxygenTight: varies, display: true
+  UnlockCost: 0, display: true
+  UnlockLevel: 1, display: true
+  TechTreeNames: Base
+}
+# CPUOut parameter has no effect on this block, not sure why.
+{ Block Id: 558, Name: Core
+  Group: cpgCore
+  Material: metal
+  ShowBlockName: true
+  Mass: 90, type: float, display: true, formatter: Kilogram
+  Volume: 17, type: float, display: true, formatter: Liter
+  IsIgnoreLC: true
+  MaxCount: 1, type: int, display: true
+  IsOxygenTight: true, display: true
+  Info: bkiCore, display: true
+  Category: Devices
+  BlastRadius: 1
+  BlastDamage: 300
+  BlockColor: "0,40,0"
+  EnergyIn: 5, type: int, display: true, formatter: Watt
+  HitPoints: 250, type: int, display: true
+  UnlockCost: 0, display: true
+  UnlockLevel: 1, display: true
+  TechTreeNames: "Small Vessel,Hover Vessel,Capital Vessel,Base"
+}
+{ Block Id: 1888, Name: ShieldGeneratorHV, Ref: ShieldGeneratorBA
+  HitPoints: 250, type: int, display: true
+  Mass: 2000, type: float, display: true, formatter: Kilogram
+  Volume: 300, type: float, display: true, formatter: Liter
+  EnergyIn: 3600, type: int, display: true, formatter: Watt
+  CPUIn: 400, type: int, display: true
+  EnergyInIdle: 360, type: int, display: true, formatter: Watt
+  ShieldCapacity: 6000, type: int, display: true
+  ShieldRecharge: 400, type: int, display: true
+  UnlockCost: 10, display: true
+  UnlockLevel: 7, display: true
+  TechTreeParent: FuelTankSV
+  TechTreeNames: Hover Vessel
+}
+{ Block Id: 282, Name: TurretTemplate
+  Group: cpgTurret
+  Material: metalhard
+  WeaponItem: TurretMSMinigunWeapon
+  Info: bkiTurret, display: true
+  Category: Weapons/Items
+  BlockColor: "110,110,110"
+  Mass: 1800, type: float, display: true, formatter: Kilogram
+  Volume: 9000, type: float, display: true, formatter: Liter
+  StackSize: 6
+  BlastRadius: 3
+  BlastDamage: 80
+  EnergyIn: 5, type: int, display: true, formatter: Watt
+  CPUIn: 200, type: int, display: true
+  HitPoints: 3450, type: int, display: true
+  RotSpeed: 120, type: int, display: true
+  Zoom: 5, type: float
+}
+{ Block Id: 697, Name: ThrusterJetRound1x3x1, Ref: ThrusterJetRound3x7x3
+  Volume: 40, type: float, display: true, formatter: Liter
+  Mass: 350, type: float, display: true, formatter: Kilogram
+  HitPoints: 300, type: int, display: true
+  ThrusterForce: 228, type: int, display: true, formatter: Newton
+  EnergyIn: 108, type: int, display: true, formatter: Watt
+  CPUIn: 40, type: int, display: true
+  UnlockCost: 12, display: true
+  UnlockLevel: 10, display: true
+  TechTreeParent: 
+  TechTreeNames: Small Vessel
+  Temperature: 140, display: true
+}
+{ Block Id: 604, Name: RCSBlockGV
+  Group: cpgRCS
+  Material: metal
+  ShowBlockName: true
+  Volume: 40, type: float, display: true, formatter: Liter
+  Mass: 200, type: float, display: true, formatter: Kilogram
+  IsOxygenTight: false, display: true
+  IsIgnoreLC: true
+  Info: bkiGyroscopeGV, display: true
+  StackSize: 6
+  BlockColor: "110,110,110"
+  Category: Devices
+  Torque: 80, type: int, display: true, formatter: NewtonMeter
+  EnergyIn: 1, type: int, display: true, formatter: Watt
+  CPUIn: 60, type: int, display: true
+  BlastRadius: 4
+  BlastDamage: 100
+  UnlockCost: 2, display: true
+  UnlockLevel: 1, display: true
+  TechTreeNames: Hover Vessel
+}
+{ Item Id: 2168, Name: TurretGVArtilleryWeapon
+  StackSize: 5
+  Mass: 450, type: float, display: false, formatter: Kilogram
+  Category: Weapons/Items
+  {
+    ROF: 13, type: float, display: true, formatter: ROF
+    Range: 5200, display: false
+    RangeSpace: 8300, display: false
+    AmmoCapacity: 1, display: true
+    AmmoType: ArtilleryRocket, display: true
+    NoiseStrength: 200, display: false
+    CameraShake: 4
+    ReloadDelay: 13, display: true
+  }
+}
+{ Block Id: 716, Name: TurretGVArtillery
+  Group: cpgTurret
+  Material: metalhard
+  WeaponItem: TurretGVArtilleryWeapon
+  TemplateRoot: TurretGVArtilleryBlocks
+  Info: bkiTurret, display: true
+  Category: Weapons/Items
+  BlockColor: "110,110,110"
+  Volume: 800, type: float, display: true, formatter: Liter
+  Mass: 1200, type: float, display: true, formatter: Kilogram
+  StackSize: 6
+  BlastRadius: 2
+  BlastDamage: 50
+  EnergyIn: 5, type: int, display: true, formatter: Watt
+  CPUIn: 520, type: int, display: true
+  HitPoints: 935, type: int, display: true
+  RotSpeed: 60, type: int, display: true
+  Zoom: 5, type: float
+}

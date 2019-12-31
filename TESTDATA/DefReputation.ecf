@@ -1,0 +1,6 @@
+# Allow to override the default reputation for all Origin based factions to NPC factions
+{ Reputation Name: "Human:1"
+  Zirax: 8500
+  Talon: 12500
+  Polaris: 16500
+}
