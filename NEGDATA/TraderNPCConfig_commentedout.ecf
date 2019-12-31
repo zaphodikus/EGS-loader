@@ -1,0 +1,10 @@
+
+# Please do not change the name of the default trader
+#{ Trader Name: TraderDefault
+#  SellingText: "Hi, I am trader <NAME>\nI am selling <GOODS>.\nYou can pay with <PAYMENT>."
+#  # SellingText: "trwDefaultSellingText"
+#  SellingGoods: "trwFood"
+#  Item1: "CannedVegetables, 100-150, 3-5, 80-100, 5-10"
+#  Item2: "CannedMeat, 222-333, 3-5, 178-222,5-10"
+#}
+
