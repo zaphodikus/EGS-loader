@@ -42,8 +42,8 @@ def test_numobjects_loaded_FactionECF():
 # 37 EGroups expected
 def test_numobjects_loaded_GroupsECF():
     v= load_ecf("TESTDATA\\EGroupsConfig.ecf")
-    assert len(v[0].keys()) == 37
-    assert len(v[1].keys()) == 37
+    assert len(v.keys()) == 58
+
 
 
 # 7 Shapes expected
@@ -56,5 +56,4 @@ def test_numobjects_loaded_BlockShapesECF():
 # 37 Reputations expected
 def test_numobjects_loaded_ReputationECF():
     v= load_ecf("TESTDATA\\DefReputation.ecf")
-    assert len(v[0].keys()) == 37
-    assert len(v[1].keys()) == 37
+    assert len(v.keys()) == 1

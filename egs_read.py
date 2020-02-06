@@ -13,13 +13,27 @@ def find_ecf_value_MoneyCard(output):
         print(x.group(1))
 
 
+class ALine:
+    """
+    Keep track of text line numbers internally.
+    """
+    def __init__(self, text, number=1):
+        self.text = text.lstrip()
+        self.line = number
+        self.ignore = len(self.text) == 0 or self.text[0] == '#'
+
+    def __repr__(self):
+        if self.ignore: return ""
+        return f'{self.text}'
+
+
 # class to define the kinds of ecf file we cater for
 class ECFType(Enum):
     AutoDetect=0
     Config=1    # Config_example/Config
     Trader=2    # TraderNPCConfig
     Faction=3   # FactionWarfare
-    EGroups=4   # EGroupsConfig
+    EGroup=4   # EGroupsConfig
     Reputation=5  # DefReputation
     Shapes=6    # BlockShapesWindow
 
@@ -44,6 +58,10 @@ class ECFExpectedString(ECFException):
         _context = context
 
 def load_ecf(config_file = "C:\\ssd\\Steam\\SteamApps\\common\\Empyrion - Galactic Survival\\Content\\Configuration\\Config_Example.ecf", type=ECFType.AutoDetect, debug = False):
+    """
+    Returns a dictionary, or a dictionary tupple depending on which file we parse. The records are plain text, and do
+    not get parsed yet.
+    """
     output = open(config_file,'r').read()
     ecfimport = {}      #Allow for String => int lookup
     ecfimportOrig = {}  #Allow for int => string lookup for blocks only
@@ -51,6 +69,8 @@ def load_ecf(config_file = "C:\\ssd\\Steam\\SteamApps\\common\\Empyrion - Galact
     ecfImportFaction = {}   # Names
     ecfImportScenario = {}  # Faction scenario
     ecfImportUnit = {}      # Faction units
+    ecfImportGroup = {}
+    ecfImportReputation = {}
 
     version = re.search("VERSION:\\s([\\d]*)", output) # only in the Config.ecf file
     if version:
@@ -69,6 +89,8 @@ def load_ecf(config_file = "C:\\ssd\\Steam\\SteamApps\\common\\Empyrion - Galact
         faction_name = ""
         faction_scenario = ""
         faction_unit = ""
+        egroup_name = ""
+        reputation_name = ""
         sb = re.split(",|\n",ss)
         for se in sb:
             # print(se)
@@ -103,6 +125,18 @@ def load_ecf(config_file = "C:\\ssd\\Steam\\SteamApps\\common\\Empyrion - Galact
                         te = 1
                         m = re.findall(".*\\sName:\\s([a-zA-Z0-9\\d]*)", ss)
                         faction_scenario = m[1] # second match in a findall
+                    elif se.__contains__(" EGroup"): # EGroup
+                        if type == ECFType.AutoDetect:  # autodetect logic
+                            type = ECFType.EGroup
+                        te = 1
+                        m = re.findall(".*\\sName:\\s([a-zA-Z0-9\\d]*)", ss)
+                        egroup_name = m[0]
+                    elif se.__contains__(" Reputation"): # EGroup
+                        if type == ECFType.AutoDetect:  # autodetect logic
+                            type = ECFType.Reputation
+                        te = 1
+                        m = re.findall(".*\\sName:\\s\"([a-zA-Z0-9\\d:]*)\"", ss)
+                        reputation_name = m[0]
 
                 except Exception as e: # TODO: gobble handle text/alphabetics type errors here
                     print("Exception:{0}".format(e))
@@ -123,6 +157,10 @@ def load_ecf(config_file = "C:\\ssd\\Steam\\SteamApps\\common\\Empyrion - Galact
                     ecfImportScenario[faction_scenario] = sb  # faction scenario
                 elif faction_unit != "":
                     ecfImportUnit[faction_unit] = sb # faction unit
+                elif egroup_name != "":
+                    ecfImportGroup[egroup_name] = sb  # EGroup
+                elif reputation_name != "":
+                    ecfImportReputation[reputation_name] = sb  # EGroup
                 else:
                     ecfimport[ts.lower().strip()] = te
                     ecfimportOrig[te] = ts.lower().strip()
@@ -133,5 +171,9 @@ def load_ecf(config_file = "C:\\ssd\\Steam\\SteamApps\\common\\Empyrion - Galact
         return  ecfImportTrader
     elif ECFType.Faction == type:
         return (ecfImportFaction,ecfImportScenario,ecfImportUnit)
+    elif ECFType.EGroup == type:
+        return ecfImportGroup
+    elif ECFType.Reputation == type:
+        return ecfImportReputation
     else:
         return (ecfimport, ecfimportOrig)
