@@ -21,6 +21,11 @@ class ALine:
         self.text = text.lstrip()
         self.line = number
         self.ignore = len(self.text) == 0 or self.text[0] == '#'
+        if not self.ignore and text[:8] == 'VERSION:':
+            version = re.search("VERSION:\\s([\\d]*)", text)  # only in the Config.ecf file
+            if version:
+                self.version = version.group(1)
+                self.ignore = True
 
     def __repr__(self):
         if self.ignore: return ""
