@@ -25,8 +25,6 @@ def get_language_string(name:str, language = default_language):
         return "[{}]".format(name) # make it clear that this item never shows up in item menu
 
 
-
-
 class HelloECF:
     def __init__(self, master, languages):
         row = 0
@@ -37,7 +35,7 @@ class HelloECF:
         row += 1
         text = ttk.Label(master, text = "Language").grid(row=row, column=0, pady=(7,7))
         self.language = StringVar()
-        self.cb_language = ttk.Combobox(master, textvariable= self.language)
+        self.cb_language = ttk.Combobox(master, textvariable= self.language, state="readonly")
         self.cb_language.grid(row=row , column=1)
         self.cb_language.config(values=languages)
         self.language.set('English') # a default
@@ -58,7 +56,7 @@ class HelloECF:
         #entity_names = [entity.Name for entity in entities]
         #self.cb_itemname.config(values = entity_names)
         self.cb_itemname.bind("<<ComboboxSelected>>", self.item_box_updated)
-#        self.fill_item_listbox(None)
+        #self.fill_item_listbox(None)
 
         row +=1
         self.item = "noone"
@@ -67,53 +65,57 @@ class HelloECF:
         self.button = ttk.Button(master, text="Press me", command = self.Pressed)
         self.button.grid(row=row, column=1)
         row +=1
-
         # tree control for entity
 
-
         self.entity_tree = ttk.Treeview(master)
-        self.entity_tree.grid(row=row, column =0, columnspan=4, pady=(7,7))
-        self.entity_tree.config(columns = ("value", "default"))
-        self.entity_tree.column("#0", width = 250, anchor="e")
-        self.entity_tree.column("value", width = 350, anchor="w")
-        self.entity_tree.column("default", width = 150, anchor="w")
+        self.entity_tree.grid(row=row, column=0, columnspan=4, pady=(7,7))
+        self.entity_tree.config(columns=("value", "default"))
+        self.entity_tree.column("#0", width=250, anchor="e")
+        self.entity_tree.column("value", width=250, anchor="w")
+        self.entity_tree.column("default", width=250, anchor="w")
 
         self.entity_tree.heading("#0", text="<element>")
         self.entity_tree.heading("value", text="Value")
         self.entity_tree.heading("default", text="Default")
-
+        self.reload_entities(path_vanilla)
         self.images = {}
-        self.utypes = []
-        self.row = row #should really use a frame here
-        # load the vanilla file basis
-        self.set_ecf_file(path_vanilla)
+        self.ent_types = []
+        for entry in self.entities:
+            val = self.entities[entry]
+            if not val.Type in self.ent_types:
+                self.ent_types.append(val.Type)
+        wd = os.getcwd()
+        for name in self.ent_types:
+            filepath = (wd + "\\ecf_compare\\img_{}.gif".format(name)).replace("\\", '/')
+            self.images[name] = PhotoImage(file=filepath)
 
-        #self.item_box_updated(None)
+        # load the defaults file too
+        gen = ecf_parser.entries_from_ecf_file(path_vanilla)
+        # ignore containers and lootz etc
+        entities_list = [entry for entry in gen if entry.Type in ['Template', 'Entity', 'Item', 'Block']]
+        self.default_entities = dict(zip([entity.Name for entity in entities_list] ,entities_list))
+
+        self.row = row #should really use a frame here
+        self.fill_item_listbox(filter="")
+        self.item_box_updated(None)
+
+    def reload_entities(self, filename):
+        # (re)load the .ECF file
+        self.label_path_vanilla["text"] = "Loading... {}".format(filename)
+        gen = ecf_parser.entries_from_ecf_file(filename)
+        # ignore containers and lootz etc
+        entities_list = [entry for entry in gen if entry.Type in ['Template', 'Entity', 'Item', 'Block']]
+        self.entities = dict(zip([entity.Name for entity in entities_list] ,entities_list))
+        self.label_path_vanilla["text"] = "File {}".format(filename)
 
     def browse_file(self):
         dir = self.label_path_vanilla["text"].split(' ')[1:][0]
         initial = os.path.normpath(os.path.split(dir)[0])
         filename = filedialog.askopenfilename(initialdir = initial, title = "Select A File", \
                 filetype = (("Config files","*.ecf"),("all files","*.*")) )
-        self.set_ecf_file(filename)
-
-    def set_ecf_file(self, filename):
-        self.label_path_vanilla["text"] = "File {}".format(filename)
         # load the file
-        gen = ecf_parser.entries_from_ecf_file(filename)
-        # ignore containers and lootz etc
-        items = [entry for entry in gen if entry.Type in ['Template', 'Entity', 'Item', 'Block']]
-        self.entities = dict(zip([entity.Name for entity in items] ,items))
-        if not len(self.utypes):
-            wd = os.getcwd()
-            for entry in self.entities:
-                if not entry.Type in self.utypes:
-                    self.utypes.append(entry.Type)
-            for name in self.utypes:
-                filepath = (wd + "\\ecf_compare\\img_{}.gif".format(name)).replace("\\", '/')
-                self.images[name] = PhotoImage(file=filepath)
-
-
+        self.reload_entities(filename)
+        self.fill_item_listbox("")
         self.item_box_updated(None)
 
     def item_box_updated(self, event):
