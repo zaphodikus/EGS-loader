@@ -1,5 +1,6 @@
 # read and understand the structure
 import os
+import re
 import ecf_parser
 from tkinter import *
 from tkinter import ttk
@@ -125,15 +126,62 @@ class HelloECF:
             self.entity_tree.delete(i)
         # populate
         self.entity_tree.heading("#0", text=ent.Name)
+        self.set_default_id(ent.Id)
         rowsadded = self.populate_tree(ent)
-        print("rows={}".format(rowsadded))
 
+    def set_default_id(self, id):
+        self.default_entity = None
+        for entity in self.default_entities:
+            ty = self.default_entities[entity]
+            if ty.Id == id:
+                self.default_entity = ty
+
+    class list_to_object():
+        def __init__(self, obj):
+            if isinstance(obj, list):
+                for item in obj:
+                    if isinstance(item, ecf_parser.Entry):
+                        self.__setattr__("Properties", item)
+                    else:
+                        self.__setattr__(item['Name'], item['Value'])
+            else:
+                self.__setattr__(obj['Name'], obj['Value'])
+
+    def replace_chars(self, old_str:str, all_chars:str, with_chars:str):
+        result=old_str
+        for ch in all_chars:
+            result = result.replace(ch, with_chars).replace(with_chars+with_chars,with_chars)
+        return result
+
+    def get_default_value(self, unique_id):
+        #s=unique_id
+        #for ch in "01234567890":
+        #    s = s.replace(ch, " ").replace('  ',' ')
+        temp=self.replace_chars(unique_id, "01234567890", " ")
+        keys = [k for k in temp.split(' ') if k.strip()] # split on space and remove any empties
+        print("Search for {}".format("/".join(keys)))
+        root = self.default_entity
+        for key in keys:
+            if key == "Type":
+                if hasattr(root, 'Type'):
+                    default = root.__getattribute__(key)
+                    if isinstance(root.Properties, ecf_parser.Entry):
+                        root = root.Properties
+                    else:
+                        root = HelloECF.list_to_object(root.Properties)
+                else:
+                    root = root.Properties
+                    default = root.__getattribute__(key)
+                    root = HelloECF.list_to_object(root.Properties)
+            else:
+                default = root.__getattribute__(key)
+                if hasattr(root, 'Properties'):
+                    if isinstance(root.Properties, ecf_parser.Entry):
+                        root = root.Properties
+        print("default={}".format(default))
+        return(default)
 
     def populate_tree(self, ent, row_index=0, parent_name= ""):
-        class listObject(list):
-            def __init__(self, list):
-                self.__setattr__(list['Name'], list['Value'])
-
         row =0
         rowsadded = 0
         unique_id = parent_name # parent node in tree
@@ -147,13 +195,12 @@ class HelloECF:
                     args['image'] = self.images[ent.Type]
                 print(args)
                 self.entity_tree.insert( **args)
-                print("= {}".format(getattr(ent, property)))
                 value = getattr(ent, property)
                 if property == 'Name':
                     value += " ({})".format(get_language_string(value, self.language.get()))
 
                 self.entity_tree.set(unique_id, "value", value)
-                self.entity_tree.set(unique_id, "default", "?")
+                self.entity_tree.set(unique_id, "default", self.get_default_value(unique_id))
                 row += 1
             else:
                 if "Properties" == property:
@@ -163,11 +210,11 @@ class HelloECF:
                             rowsadded += self.populate_tree(subproperty, row , parent_name=unique_id)
                         else:
                             if isinstance(subproperty, dict):
-                                rowsadded += self.populate_tree(listObject(subproperty), row, parent_name=unique_id)
+                                rowsadded += self.populate_tree(HelloECF.list_to_object(subproperty), row, parent_name=unique_id)
         return row + rowsadded
 
 
-    def fill_item_listbox(self, filter):
+    def fill_item_listbox(self, filter = None):
         """
         populate the list of items user can choose from, based on a filter
         :param filter:

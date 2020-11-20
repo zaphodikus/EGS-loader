@@ -1,0 +1,1 @@
+# compare a config with the stock config data

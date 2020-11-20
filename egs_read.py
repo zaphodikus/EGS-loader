@@ -6,9 +6,11 @@
 import re
 from enum import Enum
 
+
 def find_ecf_value_MoneyCard(output):
     # expr = \{\s*(?:(?!Name).)*Name:[ ]*MoneyCard(?:(?!StackSize:|\})(?:.|\n))*StackSize:[ ]*([0-9]*)
-    x = re.search("\\{\\s*(?:(?!Name).)*Name:[ ]*MoneyCard(?:(?!StackSize:|\\})(?:.|\\n))*StackSize:[ ]*([0-9]*)", output)
+    x = re.search("\\{\\s*(?:(?!Name).)*Name:[ ]*MoneyCard(?:(?!StackSize:|\\})(?:.|\\n))*StackSize:[ ]*([0-9]*)",
+                  output)
     if x:
         print(x.group(1))
 
@@ -34,17 +36,19 @@ class ALine:
 
 # class to define the kinds of ecf file we cater for
 class ECFType(Enum):
-    AutoDetect=0
-    Config=1    # Config_example/Config
-    Trader=2    # TraderNPCConfig
-    Faction=3   # FactionWarfare
-    EGroup=4   # EGroupsConfig
-    Reputation=5  # DefReputation
-    Shapes=6    # BlockShapesWindow
+    AutoDetect = 0
+    Config = 1    # Config_example/Config
+    Trader = 2    # TraderNPCConfig
+    Faction = 3   # FactionWarfare
+    EGroup = 4   # EGroupsConfig
+    Reputation = 5  # DefReputation
+    Shapes = 6    # BlockShapesWindow
+
 
 class ECFException(Exception):
     """base class to define the parser exceptions we support"""
     pass
+
 
 class ECFCollision(ECFException):
     def __index__(self, a, b, msg="ECF key collision"):
@@ -57,10 +61,12 @@ class ECFExpectedInteger(ECFException):
         super().__init__(msg)
         _context = context
 
+
 class ECFExpectedString(ECFException):
     def __index__(self, context=None, msg= "ECF expected a string"):
         super().__init__(msg)
         _context = context
+
 
 def load_ecf(config_file = "C:\\ssd\\Steam\\SteamApps\\common\\Empyrion - Galactic Survival\\Content\\Configuration\\Config_Example.ecf", type=ECFType.AutoDetect, debug = False):
     """
@@ -173,9 +179,9 @@ def load_ecf(config_file = "C:\\ssd\\Steam\\SteamApps\\common\\Empyrion - Galact
         print("ECF loaded: {0}".format(config_file))
 
     if ECFType.Trader == type:
-        return  ecfImportTrader
+        return ecfImportTrader
     elif ECFType.Faction == type:
-        return (ecfImportFaction,ecfImportScenario,ecfImportUnit)
+        return (ecfImportFaction, ecfImportScenario, ecfImportUnit)
     elif ECFType.EGroup == type:
         return ecfImportGroup
     elif ECFType.Reputation == type:
